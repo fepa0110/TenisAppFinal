@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Scoreboard
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilledTonalIconToggleButton
@@ -27,27 +30,43 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import com.example.functionallightsnew.types.ItemMenu
 import com.example.tenisappf.screens.LoginScreen
+import com.example.tenisappf.screens.PlayersScreen
+import com.example.tenisappf.screens.TournamentsScreen
 import com.example.tenisappf.ui.theme.TenisAppFTheme
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+
+const val SCREEN_TOURNAMENTS = "Torneos"
+const val SCREEN_PLAYERS = "Jugadores"
+
+val items = listOf(
+    ItemMenu(
+        SCREEN_TOURNAMENTS, Icons.Default.SportsTennis
+    ), ItemMenu(
+        SCREEN_PLAYERS, Icons.Default.People
+    )
+)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            TenisAppFTheme {
+            TenisAppFTheme(darkTheme = true, dynamicColor = false) {
                 TenisAppFApp()
             }
         }
@@ -58,116 +77,98 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun TenisAppFApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+    val selectedItemIndex = rememberSaveable { mutableIntStateOf(0) }
 
     val tenisDatabase = Firebase.firestore
 
-    tenisDatabase.collection("tournaments")
-        .get()
-        .addOnSuccessListener { result ->
-            for (document in result) {
-                Log.d("DATABASE", "${document.id} => ${document.data}")
-            }
+    tenisDatabase.collection("tournaments").get().addOnSuccessListener { result ->
+        for (document in result) {
+            Log.d("DATABASE", "${document.id} => ${document.data}")
         }
-        .addOnFailureListener { exception ->
-            Log.w("DATABASE", "Error getting documents.", exception)
-        }
+    }.addOnFailureListener { exception ->
+        Log.w("DATABASE", "Error getting documents.", exception)
+    }
 
-    LoginScreen {  }
-    /*Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text(
-                        "Torneos",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                },
-                *//* navigationIcon = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Localized description"
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Filled.Favorite,
-                            contentDescription = "Localized description"
-                        )
-                    }
-                } *//*
-            )
-        },
-        floatingActionButtonPosition = FabPosition.End,
-        floatingActionButton = {
-
-        },
-        content = { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
-        },
-        bottomBar = {
-            BottomAppBar(
+//    LoginScreen {  }
+    Scaffold(topBar = {
+        TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primary,
-                *//*floatingActionButton = {
-                    FloatingButton(icon = Icons.Filled.Add,
-                        onClick = {
-                            lifecycleScope.launch {
-                                gamesViewModel.create(Tournament(nombre = "Torneo 1", fecha = Date()))
-                            }
+                titleContentColor = Color.DarkGray
+            ),
+            title = {
+                Text(
+                    items[selectedItemIndex.intValue].name,
+                    style = MaterialTheme.typography.displaySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            navigationIcon = {
+                /*IconButton(onClick = { scopeDrawerState.launch { drawerState.open() } }) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        contentDescription = "Menu"
+                    )
+                }*/
+            },
+            actions = {
+                IconButton(onClick = { }) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        contentDescription = "Notificaciones"
+                    )
+                }
+
+            }
+        )
+    }, floatingActionButtonPosition = FabPosition.End, floatingActionButton = {
+
+    }, content = { innerPadding ->
+        when (items[selectedItemIndex.intValue].name) {
+            SCREEN_TOURNAMENTS -> TournamentsScreen(innerPading = innerPadding)
+
+            SCREEN_PLAYERS -> PlayersScreen(innerPading = innerPadding)
+        }
+    }, bottomBar = {
+        BottomAppBar(
+            containerColor = MaterialTheme.colorScheme.primary, floatingActionButton = {
+                /*FloatingButton(icon = Icons.Filled.Add,
+                    onClick = {
+                        lifecycleScope.launch {
+                            gamesViewModel.create(Tournament(nombre = "Torneo 1", fecha = Date()))
                         }
-                )},*//*
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                actions = {
-                    FilledTonalIconToggleButton(checked = true, onCheckedChange = { }) {
-                        Icon(Icons.Filled.SportsTennis, contentDescription = "Tournaments")
                     }
-                    IconButton(onClick = { }) {
-                        Icon(
-                            Icons.Filled.Scoreboard,
-                            contentDescription = "Games",
-                        )
+                )*/
+            },
+            contentPadding = PaddingValues(horizontal = 20.dp),
+            actions = {
+                items.forEachIndexed { itemIndex, itemMenu ->
+                    if (selectedItemIndex.intValue == itemIndex) {
+                        FilledTonalIconToggleButton(checked = true, onCheckedChange = { }) {
+                            Icon(itemMenu.icon, contentDescription = itemMenu.name)
+                        }
+                    } else {
+                        IconButton(onClick = { selectedItemIndex.value = itemIndex }) {
+                            Icon(
+                                itemMenu.icon,
+                                contentDescription = itemMenu.name,
+                            )
+                        }
                     }
                 }
-            )
-        }
-    )*/
+            })
+    })
 
 
-}
-
-enum class AppDestinations(
-    val label: String,
-    val icon: Int,
-) {
-    HOME("Home", R.drawable.ic_home),
-    FAVORITES("Torneos", R.drawable.ic_favorite),
-    PROFILE("Jugadores", R.drawable.ic_account_box),
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     TenisAppFTheme {
-        Greeting("Android")
     }
 }

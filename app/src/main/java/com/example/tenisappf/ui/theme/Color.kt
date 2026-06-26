@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 val Green = Color(0xFF8FC93A)
 val Jade = Color(0xFF3BB273)
+val Emerald = Color(0xFF62C370)
 val MidnightGreen = Color(0xFF044750)
 val GunMetal = Color(0xFF143642)
 
