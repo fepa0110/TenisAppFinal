@@ -123,7 +123,7 @@ fun TenisAppFApp() {
         when (items[selectedItemIndex.intValue].name) {
             SCREEN_TOURNAMENTS -> TournamentsScreen(innerPading = innerPadding, tenisDatabase = tenisDatabase)
 
-            SCREEN_PLAYERS -> PlayersScreen(innerPading = innerPadding)
+            SCREEN_PLAYERS -> PlayersScreen(innerPading = innerPadding, tenisDatabase = tenisDatabase)
         }
     }, bottomBar = {
         BottomAppBar(
@@ -144,7 +144,7 @@ fun TenisAppFApp() {
                             Icon(itemMenu.icon, contentDescription = itemMenu.name)
                         }
                     } else {
-                        IconButton(onClick = { selectedItemIndex.value = itemIndex }) {
+                        IconButton(onClick = { selectedItemIndex.intValue = itemIndex }) {
                             Icon(
                                 itemMenu.icon,
                                 contentDescription = itemMenu.name,
@@ -156,11 +156,4 @@ fun TenisAppFApp() {
     })
 
 
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TenisAppFTheme {
-    }
 }
