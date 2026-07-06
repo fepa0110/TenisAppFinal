@@ -81,14 +81,6 @@ fun TenisAppFApp() {
 
     val tenisDatabase = Firebase.firestore
 
-    tenisDatabase.collection("tournaments").get().addOnSuccessListener { result ->
-        for (document in result) {
-            Log.d("DATABASE", "${document.id} => ${document.data}")
-        }
-    }.addOnFailureListener { exception ->
-        Log.w("DATABASE", "Error getting documents.", exception)
-    }
-
 //    LoginScreen {  }
     Scaffold(topBar = {
         TopAppBar(
@@ -129,7 +121,7 @@ fun TenisAppFApp() {
 
     }, content = { innerPadding ->
         when (items[selectedItemIndex.intValue].name) {
-            SCREEN_TOURNAMENTS -> TournamentsScreen(innerPading = innerPadding)
+            SCREEN_TOURNAMENTS -> TournamentsScreen(innerPading = innerPadding, tenisDatabase = tenisDatabase)
 
             SCREEN_PLAYERS -> PlayersScreen(innerPading = innerPadding)
         }
