@@ -38,7 +38,7 @@ val items = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(tenisDatabase: FirebaseFirestore){
+fun HomeScreen(tenisDatabase: FirebaseFirestore, onNavigateToTournament: (String) -> Unit){
     val selectedItemIndex = rememberSaveable { mutableIntStateOf(0) }
 
     Scaffold(topBar = {
@@ -80,7 +80,10 @@ fun HomeScreen(tenisDatabase: FirebaseFirestore){
 
     }, content = { innerPadding ->
         when (items[selectedItemIndex.intValue].name) {
-            SCREEN_TOURNAMENTS -> TournamentsScreen(innerPading = innerPadding, tenisDatabase = tenisDatabase)
+            SCREEN_TOURNAMENTS -> TournamentsScreen(innerPading = innerPadding,
+                tenisDatabase = tenisDatabase,
+                onNavigatetoTournament = onNavigateToTournament
+            )
 
             SCREEN_PLAYERS -> PlayersScreen(innerPading = innerPadding, tenisDatabase = tenisDatabase)
         }

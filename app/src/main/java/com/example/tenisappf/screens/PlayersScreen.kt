@@ -23,7 +23,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.tenisappf.items
 import com.example.tenisappf.model.Player
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObjects

@@ -13,23 +13,30 @@ import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = Emerald,
+    onPrimaryContainer = GunMetal,
+
     secondary = PurpleGrey80,
     tertiary = Pink80,
+
     background = GunMetal,
+    onBackground = BabyPowder,
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Emerald,
+    onPrimaryContainer = GunMetal,
+
     secondary = PurpleGrey40,
     tertiary = Pink40,
-    background = BabyPowder
+
+    background = BabyPowder,
+    onBackground = BabyPowder,
     /* Other default colors to override
 
     surface = Color(0xFFFFFBFE),
     onPrimary = Color.White,
     onSecondary = Color.White,
     onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
     */
 )

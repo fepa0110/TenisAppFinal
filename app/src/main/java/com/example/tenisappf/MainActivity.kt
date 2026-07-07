@@ -42,9 +42,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.tenisappf.screens.HomeScreen
 import com.example.tenisappf.screens.LoginScreen
 import com.example.tenisappf.screens.PlayersScreen
+import com.example.tenisappf.screens.TournamentScreen
 import com.example.tenisappf.screens.TournamentsScreen
 import com.example.tenisappf.ui.theme.TenisAppFTheme
 import com.google.firebase.Firebase
@@ -68,6 +72,25 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun TenisAppFApp() {
     val tenisDatabase = Firebase.firestore
+    val navController = rememberNavController()
 
-    HomeScreen(tenisDatabase)
+    val onNavigateToTournament: (String) -> Unit =
+        { tournamentId ->
+            navController.navigate("tournament/$tournamentId")
+        }
+
+    NavHost(navController, startDestination = "home") {
+        composable("home") {
+            HomeScreen(tenisDatabase, onNavigateToTournament = onNavigateToTournament)
+        }
+        composable("tournament/{tournamentId}") { backStackEntry ->
+            TournamentScreen(
+                onNavigateBack = { navController.popBackStack() },
+                backStackEntry.arguments?.getString("tournamentId"),
+
+            )
+        }
+    }
+
+
 }
