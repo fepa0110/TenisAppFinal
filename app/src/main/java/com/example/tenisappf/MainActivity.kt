@@ -42,24 +42,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
-import com.example.functionallightsnew.types.ItemMenu
+import com.example.tenisappf.screens.HomeScreen
 import com.example.tenisappf.screens.LoginScreen
 import com.example.tenisappf.screens.PlayersScreen
 import com.example.tenisappf.screens.TournamentsScreen
 import com.example.tenisappf.ui.theme.TenisAppFTheme
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
-
-const val SCREEN_TOURNAMENTS = "Torneos"
-const val SCREEN_PLAYERS = "Jugadores"
-
-val items = listOf(
-    ItemMenu(
-        SCREEN_TOURNAMENTS, Icons.Default.SportsTennis
-    ), ItemMenu(
-        SCREEN_PLAYERS, Icons.Default.People
-    )
-)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,83 +67,7 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun TenisAppFApp() {
-    val selectedItemIndex = rememberSaveable { mutableIntStateOf(0) }
-
     val tenisDatabase = Firebase.firestore
 
-//    LoginScreen {  }
-    Scaffold(topBar = {
-        TopAppBar(
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = Color.DarkGray
-            ),
-            title = {
-                Text(
-                    items[selectedItemIndex.intValue].name,
-                    style = MaterialTheme.typography.displaySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            },
-            navigationIcon = {
-                /*IconButton(onClick = { scopeDrawerState.launch { drawerState.open() } }) {
-                    Icon(
-                        imageVector = Icons.Filled.Menu,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        contentDescription = "Menu"
-                    )
-                }*/
-            },
-            actions = {
-                IconButton(onClick = { }) {
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        contentDescription = "Notificaciones"
-                    )
-                }
-
-            }
-        )
-    }, floatingActionButtonPosition = FabPosition.End, floatingActionButton = {
-
-    }, content = { innerPadding ->
-        when (items[selectedItemIndex.intValue].name) {
-            SCREEN_TOURNAMENTS -> TournamentsScreen(innerPading = innerPadding, tenisDatabase = tenisDatabase)
-
-            SCREEN_PLAYERS -> PlayersScreen(innerPading = innerPadding, tenisDatabase = tenisDatabase)
-        }
-    }, bottomBar = {
-        BottomAppBar(
-            containerColor = MaterialTheme.colorScheme.primary, floatingActionButton = {
-                /*FloatingButton(icon = Icons.Filled.Add,
-                    onClick = {
-                        lifecycleScope.launch {
-                            gamesViewModel.create(Tournament(nombre = "Torneo 1", fecha = Date()))
-                        }
-                    }
-                )*/
-            },
-            contentPadding = PaddingValues(horizontal = 20.dp),
-            actions = {
-                items.forEachIndexed { itemIndex, itemMenu ->
-                    if (selectedItemIndex.intValue == itemIndex) {
-                        FilledTonalIconToggleButton(checked = true, onCheckedChange = { }) {
-                            Icon(itemMenu.icon, contentDescription = itemMenu.name)
-                        }
-                    } else {
-                        IconButton(onClick = { selectedItemIndex.intValue = itemIndex }) {
-                            Icon(
-                                itemMenu.icon,
-                                contentDescription = itemMenu.name,
-                            )
-                        }
-                    }
-                }
-            })
-    })
-
-
+    HomeScreen(tenisDatabase)
 }

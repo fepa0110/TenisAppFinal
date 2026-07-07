@@ -1,0 +1,116 @@
+package com.example.tenisappf.screens
+
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FilledTonalIconToggleButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.google.firebase.firestore.FirebaseFirestore
+import com.example.functionallightsnew.types.ItemMenu
+
+const val SCREEN_TOURNAMENTS = "Torneos"
+const val SCREEN_PLAYERS = "Jugadores"
+
+val items = listOf(
+    ItemMenu(
+        SCREEN_TOURNAMENTS, Icons.Default.SportsTennis
+    ), ItemMenu(
+        SCREEN_PLAYERS, Icons.Default.People
+    )
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreen(tenisDatabase: FirebaseFirestore){
+    val selectedItemIndex = rememberSaveable { mutableIntStateOf(0) }
+
+    Scaffold(topBar = {
+        TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                titleContentColor = Color.DarkGray
+            ),
+            title = {
+                Text(
+                    items[selectedItemIndex.intValue].name,
+                    style = MaterialTheme.typography.displaySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            navigationIcon = {
+                /*IconButton(onClick = { scopeDrawerState.launch { drawerState.open() } }) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        contentDescription = "Menu"
+                    )
+                }*/
+            },
+            actions = {
+                IconButton(onClick = { }) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        contentDescription = "Notificaciones"
+                    )
+                }
+
+            }
+        )
+    }, floatingActionButtonPosition = FabPosition.End, floatingActionButton = {
+
+    }, content = { innerPadding ->
+        when (items[selectedItemIndex.intValue].name) {
+            SCREEN_TOURNAMENTS -> TournamentsScreen(innerPading = innerPadding, tenisDatabase = tenisDatabase)
+
+            SCREEN_PLAYERS -> PlayersScreen(innerPading = innerPadding, tenisDatabase = tenisDatabase)
+        }
+    }, bottomBar = {
+        BottomAppBar(
+            containerColor = MaterialTheme.colorScheme.primary, floatingActionButton = {
+                /*FloatingButton(icon = Icons.Filled.Add,
+                    onClick = {
+                        lifecycleScope.launch {
+                            gamesViewModel.create(Tournament(nombre = "Torneo 1", fecha = Date()))
+                        }
+                    }
+                )*/
+            },
+            contentPadding = PaddingValues(horizontal = 20.dp),
+            actions = {
+                items.forEachIndexed { itemIndex, itemMenu ->
+                    if (selectedItemIndex.intValue == itemIndex) {
+                        FilledTonalIconToggleButton(checked = true, onCheckedChange = { }) {
+                            Icon(itemMenu.icon, contentDescription = itemMenu.name)
+                        }
+                    } else {
+                        IconButton(onClick = { selectedItemIndex.intValue = itemIndex }) {
+                            Icon(
+                                itemMenu.icon,
+                                contentDescription = itemMenu.name,
+                            )
+                        }
+                    }
+                }
+            })
+    })
+}
