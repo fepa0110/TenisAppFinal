@@ -86,8 +86,8 @@ fun TenisAppFApp() {
         composable("tournament/{tournamentId}") { backStackEntry ->
             TournamentScreen(
                 onNavigateBack = { navController.popBackStack() },
-                backStackEntry.arguments?.getString("tournamentId"),
-
+                tenisDatabase = tenisDatabase,
+                tournamentId = backStackEntry.arguments?.getString("tournamentId"),
             )
         }
     }

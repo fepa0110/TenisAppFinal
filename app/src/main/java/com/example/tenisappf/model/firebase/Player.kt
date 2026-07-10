@@ -1,4 +1,4 @@
-package com.example.tenisappf.model
+package com.example.tenisappf.model.firebase
 
 data class Player(
     val nombre: String? = null,
