@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.tenisappf.screens.GameScreen
 import com.example.tenisappf.screens.HomeScreen
 import com.example.tenisappf.screens.LoginScreen
 import com.example.tenisappf.screens.PlayersScreen
@@ -79,6 +80,11 @@ fun TenisAppFApp() {
             navController.navigate("tournament/$tournamentId")
         }
 
+    val onNavigateToGame: (String, String) -> Unit =
+        { gameId, tournamentName ->
+            navController.navigate("game/$gameId/$tournamentName")
+        }
+
     NavHost(navController, startDestination = "home") {
         composable("home") {
             HomeScreen(tenisDatabase, onNavigateToTournament = onNavigateToTournament)
@@ -86,8 +92,17 @@ fun TenisAppFApp() {
         composable("tournament/{tournamentId}") { backStackEntry ->
             TournamentScreen(
                 onNavigateBack = { navController.popBackStack() },
+                onNavigateToGame = onNavigateToGame,
                 tenisDatabase = tenisDatabase,
                 tournamentId = backStackEntry.arguments?.getString("tournamentId"),
+            )
+        }
+        composable("game/{gameId}/{tournamentName}") { backStackEntry ->
+            GameScreen(
+                onNavigateBack = { navController.popBackStack() },
+                tenisDatabase = tenisDatabase,
+                gameId = backStackEntry.arguments?.getString("gameId"),
+                tournamentName = backStackEntry.arguments?.getString("tournamentName")
             )
         }
     }

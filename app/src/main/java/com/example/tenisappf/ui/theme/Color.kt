@@ -9,6 +9,8 @@ val MidnightGreen = Color(0xFF044750)
 val GunMetal = Color(0xFF143642)
 
 val Licorice = Color(0xFF261C15)
+
+val InkBlack = Color(0xFF0A1A20)
 val BabyPowder = Color(0xFFF7F7F2)
 
 val Purple80 = Color(0xFFD0BCFF)

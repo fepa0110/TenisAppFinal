@@ -61,7 +61,6 @@ fun TournamentsScreen(
     @Composable
     fun TournamentListItem(tournamentId: String?, title: String?, subtitle: String) {
         ListItem(
-//            onClick = { onNavigatetoTournament(tournamentId!!)},
             headlineContent = { Text(title!!) },
             supportingContent = { Text(subtitle) },
             trailingContent = {

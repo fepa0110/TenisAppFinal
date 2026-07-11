@@ -2,9 +2,11 @@ package com.example.tenisappf.screens
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -36,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.tenisappf.model.firebase.Game
+import com.example.tenisappf.model.ui.GameUI
 import com.example.tenisappf.model.firebase.Player
 import com.example.tenisappf.model.firebase.Tournament
 import com.example.tenisappf.utils.DateFormats
@@ -44,19 +47,11 @@ import com.google.firebase.firestore.toObject
 
 private const val TAG = "TournamentScreen"
 
-private data class GameUI(
-    val jugador1: Player? = null,
-    val jugador2: Player? = null,
-    val puntajeJugador1: Int? = 0,
-    val puntajeJugador2: Int? = 0,
-    val torneo: Tournament? = null,
-    val estado: String? = null
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TournamentScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToGame: (String, String) -> Unit,
     tenisDatabase: FirebaseFirestore,
     tournamentId: String?
 ) {
@@ -113,6 +108,7 @@ fun TournamentScreen(
                                             puntajeJugador2 = game.puntajeJugador2,
                                             estado = game.estado
                                         )
+                                        Log.i(TAG, "Game: " + gameDocument.id)
                                     }
                             }
                     }
@@ -133,7 +129,7 @@ fun TournamentScreen(
             headlineContent = { Text(title) },
             supportingContent = { Text(subtitle) },
             trailingContent = {
-                IconButton(onClick = { }) {
+                IconButton(onClick = { onNavigateToGame(gameId!!, tournament.value.nombre!!) }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowRight,
                         tint = Color.White,
@@ -182,11 +178,13 @@ fun TournamentScreen(
             )
 
             if (loadingGames.value) {
-                CircularProgressIndicator(
-                    modifier = Modifier.width(64.dp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    trackColor = MaterialTheme.colorScheme.primary,
-                )
+                Row(modifier = Modifier.padding(horizontal = 10.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.width(64.dp).padding(top = 8.dp),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        trackColor = MaterialTheme.colorScheme.primary,
+                    )
+                }
             }
             else {
                 LazyColumn() {
@@ -215,7 +213,7 @@ fun TournamentScreen(
                 Text(
                     "Torneo",
                     style = MaterialTheme.typography.displaySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -224,7 +222,7 @@ fun TournamentScreen(
                 IconButton(onClick = { onNavigateBack() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         contentDescription = "Back"
                     )
                 }
@@ -233,7 +231,7 @@ fun TournamentScreen(
                 IconButton(onClick = { }) {
                     Icon(
                         imageVector = Icons.Default.Notifications,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         contentDescription = "Notificaciones"
                     )
                 }
