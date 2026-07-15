@@ -6,8 +6,8 @@ import com.example.tenisappf.model.firebase.Tournament
 data class GameUI(
     val jugador1: Player? = null,
     val jugador2: Player? = null,
-    val puntajeJugador1: Int? = 0,
-    val puntajeJugador2: Int? = 0,
+    var puntajeJugador1: Int? = 0,
+    var puntajeJugador2: Int? = 0,
     val torneo: Tournament? = null,
     val estado: String? = null
 )
