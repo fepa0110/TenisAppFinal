@@ -9,12 +9,18 @@ class GameViewModel : ViewModel() {
     private var _game = MutableLiveData(GameUI())
     val game: LiveData<GameUI> = _game
 
-    fun updateGame(newGame: GameUI){
+    fun updateGame(newGame: GameUI) {
         _game.value = newGame
     }
 
-    fun updatePuntajes(puntajeJugador1: Int, puntajeJugador2: Int){
-        _game.value!!.puntajeJugador1 = puntajeJugador1
-        _game.value!!.puntajeJugador2 = puntajeJugador2
+    fun updatePuntajes(puntajeJugador1: Int, puntajeJugador2: Int) {
+        _game.value = GameUI(
+            jugador1 = _game.value!!.jugador1,
+            jugador2 = _game.value!!.jugador2,
+            puntajeJugador1 = puntajeJugador1,
+            puntajeJugador2 = puntajeJugador2,
+            torneo = _game.value!!.torneo,
+            estado = _game.value!!.estado
+        )
     }
 }

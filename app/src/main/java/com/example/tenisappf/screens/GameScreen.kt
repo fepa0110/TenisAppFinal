@@ -203,6 +203,15 @@ fun GameScreen(
                             game.puntajeJugador1!!.toString()
                         )
 
+                        Text(
+                            game.puntajeJugador1!!.toString(),
+                            modifier = Modifier.padding(top = 6.dp, bottom = 3.dp),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        
                         if (role == "admin") {
                             Row(
                                 modifier = Modifier
