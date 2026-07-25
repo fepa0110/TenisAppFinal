@@ -1,7 +1,10 @@
 package com.example.tenisappf.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.SportsTennis
@@ -24,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.functionallightsnew.types.ItemMenu
+import com.google.firebase.auth.FirebaseAuth
 
 const val SCREEN_TOURNAMENTS = "Torneos"
 const val SCREEN_PLAYERS = "Jugadores"
@@ -38,7 +42,13 @@ val items = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(tenisDatabase: FirebaseFirestore, onNavigateToTournament: (String) -> Unit){
+fun HomeScreen(
+    tenisDatabase: FirebaseFirestore,
+    firebaseAuth: FirebaseAuth,
+    signOutUser: () -> Unit,
+    onNavigateToTournament: (String) -> Unit
+) {
+    BackHandler(onBack = {}, enabled = false)
     val selectedItemIndex = rememberSaveable { mutableIntStateOf(0) }
 
     Scaffold(topBar = {
@@ -66,11 +76,11 @@ fun HomeScreen(tenisDatabase: FirebaseFirestore, onNavigateToTournament: (String
                 }*/
             },
             actions = {
-                IconButton(onClick = { }) {
+                IconButton(onClick = { signOutUser() }) {
                     Icon(
-                        imageVector = Icons.Default.Notifications,
+                        imageVector = Icons.AutoMirrored.Default.ExitToApp,
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        contentDescription = "Notificaciones"
+                        contentDescription = "Cerrar sesion"
                     )
                 }
 
@@ -80,12 +90,16 @@ fun HomeScreen(tenisDatabase: FirebaseFirestore, onNavigateToTournament: (String
 
     }, content = { innerPadding ->
         when (items[selectedItemIndex.intValue].name) {
-            SCREEN_TOURNAMENTS -> TournamentsScreen(innerPading = innerPadding,
+            SCREEN_TOURNAMENTS -> TournamentsScreen(
+                innerPading = innerPadding,
                 tenisDatabase = tenisDatabase,
                 onNavigatetoTournament = onNavigateToTournament
             )
 
-            SCREEN_PLAYERS -> PlayersScreen(innerPading = innerPadding, tenisDatabase = tenisDatabase)
+            SCREEN_PLAYERS -> PlayersScreen(
+                innerPading = innerPadding,
+                tenisDatabase = tenisDatabase
+            )
         }
     }, bottomBar = {
         BottomAppBar(

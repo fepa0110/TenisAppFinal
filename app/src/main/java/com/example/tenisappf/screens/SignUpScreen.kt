@@ -1,6 +1,7 @@
 package com.example.tenisappf.screens
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import com.example.tenisapp.components.PrimaryButton
 import com.example.tenisappf.components.TertiaryButton
 
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tenisapp.viewModel.LoginViewModel
+import com.example.tenisapp.viewModel.SignUpViewModel
 
 import com.example.tenisappf.R
 import com.google.firebase.auth.FirebaseAuth
@@ -41,17 +43,17 @@ import kotlinx.coroutines.launch
 
 //import com.example.tenisapp.AppViewModelProvider
 
-private const val TAG = "LoginScreen"
+private const val TAG = "SignUpScreen"
 
 @Composable
-fun LoginScreen(
+fun SignUpScreen(
     tenisDatabase: FirebaseFirestore,
     firebaseAuth: FirebaseAuth,
     onNavigateToHome: () -> Unit,
-    onNavigateToSignUp: () -> Unit,
-    viewModel: LoginViewModel = viewModel()
+    onNavigateBack: () -> Unit,
+    viewModel: SignUpViewModel = viewModel()
 ) {
-    val currentUser = firebaseAuth.currentUser
+    BackHandler(onBack = onNavigateBack)
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scopeSnackBar = rememberCoroutineScope()
@@ -64,18 +66,21 @@ fun LoginScreen(
         }
     }
 
-    fun loginWithEmail(email: String, password: String){
-        firebaseAuth.signInWithEmailAndPassword(email, password)
+    fun createUser(email: String, password: String) {
+
+        firebaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener() { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "signInWithEmail:success")
+                    Log.d(TAG, "createUserWithEmail:success")
                     val user = firebaseAuth.currentUser
                     onNavigateToHome()
+//                    updateUI(user)
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.w(TAG, "signInWithEmail:failure", task.exception)
+                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     openSnackBar("Authentication failed.")
+//                    updateUI(null)
                 }
             }
     }
@@ -104,13 +109,13 @@ fun LoginScreen(
     }
 
     @Composable
-    fun UsernameField(username: String, onTextFieldChanged: (String) -> Unit) {
+    fun EmailField(username: String, onTextFieldChanged: (String) -> Unit) {
         TextField(
             value = username, onValueChange = { onTextFieldChanged(it) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 3.dp),
-            label = { Text("Usuario") },
+            label = { Text("Email") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
             maxLines = 1,
@@ -124,10 +129,6 @@ fun LoginScreen(
         )
     }
 
-    fun signIn(username: String, password: String) {
-
-    }
-
     @Composable
     fun HeaderImage() {
         Box(
@@ -139,6 +140,8 @@ fun LoginScreen(
                     contentScale = ContentScale.FillWidth
                 ),
             contentAlignment = Alignment.Center
+//            horizontalArrangement = Arrangement.Center,
+//            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 modifier = Modifier.padding(top = 10.dp),
@@ -149,7 +152,7 @@ fun LoginScreen(
     }
 
     @Composable
-    fun LoginForm() {
+    fun SignUpForm() {
         val email: String by viewModel.username.observeAsState(initial = "")
         val password: String by viewModel.password.observeAsState(initial = "")
         val loginEnable: Boolean by viewModel.loginEnable.observeAsState(initial = false)
@@ -166,7 +169,7 @@ fun LoginScreen(
         ) {
 
             Spacer(modifier = Modifier.padding(16.dp))
-            UsernameField(email) { viewModel.onLoginChanged(it, password) }
+            EmailField(email) { viewModel.onLoginChanged(it, password) }
             Spacer(modifier = Modifier.padding(4.dp))
             PasswordField(password) {
                 viewModel.onLoginChanged(
@@ -174,23 +177,18 @@ fun LoginScreen(
                 )
             }
             Spacer(modifier = Modifier.padding(16.dp))
-            /*LoginButton(loginEnable) {
-                coroutineScope.launch {
-                    viewModel.onLoginSelected()
-                }
-                onNavigateToTournaments()
-            }*/
+
             PrimaryButton(
-                text = "Login",
+                text = "Registarse",
                 enabled = true,
-                onClick = { loginWithEmail(email, password) }
+                onClick = { createUser(email, password)}
             )
 
             Spacer(modifier = Modifier.padding(16.dp))
 
             TertiaryButton(
-                text = "Registrarse",
-                onClick = { onNavigateToSignUp() },
+                text = "Volver",
+                onClick = { },
                 enabled = true
             )
 
@@ -198,7 +196,7 @@ fun LoginScreen(
     }
 
     @Composable
-    fun LoginContent(innerPadding: PaddingValues) {
+    fun SignUpContent(innerPadding: PaddingValues) {
 //    val isLoading: Boolean by viewModel.isLoading.observeAsState(initial = false)
 
         /*    if (isLoading) {
@@ -208,26 +206,22 @@ fun LoginScreen(
             } else {*/
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(paddingValues = innerPadding)
+                .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
             horizontalAlignment = Alignment.CenterHorizontally,
 //            verticalArrangement = Arrangement.SpaceEvenly
         ) {
             HeaderImage()
             Spacer(modifier = Modifier.padding(16.dp))
-            LoginForm()
+            SignUpForm()
         }
 //    }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+    Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { innerPadding ->
-            if (currentUser != null) {
-                onNavigateToHome()
-            } else LoginContent(innerPadding)
+            SignUpContent(innerPadding)
         })
-
 }
 

@@ -1,4 +1,4 @@
-package com.example.tenisapp.components
+package com.example.tenisappf.components
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
