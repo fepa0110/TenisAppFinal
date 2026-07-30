@@ -33,6 +33,7 @@ import com.example.tenisapp.viewModel.LoginViewModel
 import com.example.tenisapp.viewModel.SignUpViewModel
 
 import com.example.tenisappf.R
+import com.example.tenisappf.model.UserRole
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
@@ -74,6 +75,16 @@ fun SignUpScreen(
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmail:success")
                     val user = firebaseAuth.currentUser
+                    val userPermission = hashMapOf(
+                        "uid" to user?.uid,
+                        "role" to UserRole.USER.descripcion
+                    )
+
+                    tenisDatabase.collection("userPermissions")
+                        .add(userPermission)
+                        .addOnSuccessListener { Log.d(TAG, "UserPermissions successfully written!") }
+                        .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
+
                     onNavigateToHome()
 //                    updateUI(user)
                 } else {

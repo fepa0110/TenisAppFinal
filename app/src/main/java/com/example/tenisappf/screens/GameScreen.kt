@@ -73,9 +73,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tenisappf.components.LoadingIndicator
 import com.example.tenisappf.components.ScoreCard
 import com.example.tenisappf.model.GameStatus
+import com.example.tenisappf.model.UserRole
 import com.example.tenisappf.model.firebase.Game
 import com.example.tenisappf.model.firebase.Player
 import com.example.tenisappf.model.firebase.Tournament
+import com.example.tenisappf.model.firebase.UserPermission
 import com.example.tenisappf.model.ui.GameUI
 import com.example.tenisappf.utils.DateFormats
 import com.example.tenisappf.viewModel.GameViewModel
@@ -83,6 +85,8 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.toObject
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.toObjects
 
 private const val TAG = "GameScreen"
 
@@ -91,24 +95,35 @@ private const val TAG = "GameScreen"
 fun GameScreen(
     onNavigateBack: () -> Unit,
     tenisDatabase: FirebaseFirestore,
+    firebaseAuth: FirebaseAuth,
     gameId: String?,
     tournamentName: String?,
     viewModel: GameViewModel = viewModel()
 ) {
+    val currentUser = firebaseAuth.currentUser
 
     val game by viewModel.game.observeAsState(GameUI())
 //    val game by viewModel.game
 
     val loading = remember { mutableStateOf<Boolean>(true) }
 
-    val role = "admin"
+    val role = remember { mutableStateOf<String>(UserRole.USER.descripcion) }
 
     val infiniteStatusIconTransition = rememberInfiniteTransition()
 
     // Ejecutar onNavigateBack cuando se presiona el boton atras fisico
     BackHandler(onBack = onNavigateBack)
 
-    LaunchedEffect("Tournament$gameId") {
+    LaunchedEffect("Game$gameId") {
+        tenisDatabase.collection("userPermissions")
+            .whereEqualTo("uid", currentUser?.uid)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { result ->
+                val userPermissions = result.toObjects<UserPermission>()
+                role.value = userPermissions.first().role.toString()
+            }
+
         if (gameId != null) {
             tenisDatabase.collection("games").document(gameId)
                 .get()
@@ -348,7 +363,8 @@ fun GameScreen(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 10.dp).padding(top = 6.dp)
+                    .padding(horizontal = 10.dp)
+                    .padding(top = 6.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -386,7 +402,7 @@ fun GameScreen(
                             game.puntajeJugador1!!.toString()
                         )
 
-                        if (role == "admin") {
+                        if (role.value == UserRole.ADMINISTRATOR.descripcion) {
                             GameControls(playerNumber = 1)
                         }
                     }
@@ -412,18 +428,21 @@ fun GameScreen(
                             game.puntajeJugador2!!.toString()
                         )
 
-                        if (role == "admin") {
+                        if (role.value == UserRole.ADMINISTRATOR.descripcion) {
                             GameControls(playerNumber = 2)
                         }
                     }
                 }
 
                 Row(
-                    modifier = Modifier.fillMaxWidth().height(90.dp).padding(bottom = 32.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(90.dp)
+                        .padding(bottom = 32.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    if (role == "admin") {
+                    if (role.value == UserRole.ADMINISTRATOR.descripcion) {
                         GameActionButton()
                     }
                 }

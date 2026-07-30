@@ -157,6 +157,7 @@ fun TenisAppFApp() {
             GameScreen(
                 onNavigateBack = { navController.popBackStack() },
                 tenisDatabase = tenisDatabase,
+                firebaseAuth = firebaseAuth,
                 gameId = backStackEntry.arguments?.getString("gameId"),
                 tournamentName = backStackEntry.arguments?.getString("tournamentName")
             )
