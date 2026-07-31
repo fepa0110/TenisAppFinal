@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.People
@@ -20,14 +21,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.functionallightsnew.types.ItemMenu
+import com.example.tenisapp.components.FloatingButton
+import com.example.tenisappf.model.UserRole
+import com.example.tenisappf.model.firebase.UserPermission
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.toObjects
 
 const val SCREEN_TOURNAMENTS = "Torneos"
 const val SCREEN_PLAYERS = "Jugadores"
@@ -48,8 +56,22 @@ fun HomeScreen(
     signOutUser: () -> Unit,
     onNavigateToTournament: (String) -> Unit
 ) {
+    val currentUser = firebaseAuth.currentUser
+    val userRole = remember { mutableStateOf<String>(UserRole.USER.descripcion) }
+
     BackHandler(onBack = {}, enabled = false)
     val selectedItemIndex = rememberSaveable { mutableIntStateOf(0) }
+
+    LaunchedEffect("HomeScreen") {
+        tenisDatabase.collection("userPermissions")
+            .whereEqualTo("uid", currentUser?.uid)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { result ->
+                val userPermissions = result.toObjects<UserPermission>()
+                userRole.value = userPermissions.first().role.toString()
+            }
+    }
 
     Scaffold(topBar = {
         TopAppBar(
@@ -104,13 +126,14 @@ fun HomeScreen(
     }, bottomBar = {
         BottomAppBar(
             containerColor = MaterialTheme.colorScheme.primary, floatingActionButton = {
-                /*FloatingButton(icon = Icons.Filled.Add,
-                    onClick = {
-                        lifecycleScope.launch {
-                            gamesViewModel.create(Tournament(nombre = "Torneo 1", fecha = Date()))
+                if (userRole.value == UserRole.ADMINISTRATOR.descripcion) {
+                    FloatingButton(
+                        icon = Icons.Filled.Add,
+                        onClick = {
+
                         }
-                    }
-                )*/
+                    )
+                }
             },
             contentPadding = PaddingValues(horizontal = 20.dp),
             actions = {

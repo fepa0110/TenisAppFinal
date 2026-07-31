@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,15 +36,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.tenisapp.components.FloatingButton
+import com.example.tenisappf.model.UserRole
 import com.example.tenisappf.model.firebase.Game
 import com.example.tenisappf.model.ui.GameUI
 import com.example.tenisappf.model.firebase.Player
 import com.example.tenisappf.model.firebase.Tournament
+import com.example.tenisappf.model.firebase.UserPermission
 import com.example.tenisappf.utils.DateFormats
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
+import com.google.firebase.firestore.toObjects
 
 private const val TAG = "TournamentScreen"
 
@@ -53,10 +60,15 @@ fun TournamentScreen(
     onNavigateBack: () -> Unit,
     onNavigateToGame: (String, String) -> Unit,
     tenisDatabase: FirebaseFirestore,
+    firebaseAuth: FirebaseAuth,
     tournamentId: String?
 ) {
+    val currentUser = firebaseAuth.currentUser
+    val userRole = remember { mutableStateOf<String>(UserRole.USER.descripcion) }
+
     val tournament = remember { mutableStateOf<Tournament>(Tournament()) }
     val games = remember { mutableStateMapOf<String, GameUI>() }
+
 
     val loadingGames = remember { mutableStateOf<Boolean>(true) }
 
@@ -64,6 +76,15 @@ fun TournamentScreen(
     BackHandler(onBack = onNavigateBack)
 
     LaunchedEffect("Tournament$tournamentId") {
+        tenisDatabase.collection("userPermissions")
+            .whereEqualTo("uid", currentUser?.uid)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { result ->
+                val userPermissions = result.toObjects<UserPermission>()
+                userRole.value = userPermissions.first().role.toString()
+            }
+
         if (tournamentId != null) {
             val tournamentReference = tenisDatabase.collection("tournaments").document(tournamentId)
 
@@ -86,8 +107,8 @@ fun TournamentScreen(
                     games.clear()
                     result.forEach { gameDocument ->
                         val game = gameDocument.toObject<Game>()
-                        var jugador1 : Player = Player();
-                        var jugador2 : Player = Player();
+                        var jugador1: Player = Player();
+                        var jugador2: Player = Player();
 
                         tenisDatabase.collection("players")
                             .document(game.jugador1!!.id)
@@ -178,15 +199,21 @@ fun TournamentScreen(
             )
 
             if (loadingGames.value) {
-                Row(modifier = Modifier.padding(horizontal = 10.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
                     CircularProgressIndicator(
-                        modifier = Modifier.width(64.dp).padding(top = 8.dp),
+                        modifier = Modifier
+                            .width(64.dp)
+                            .padding(top = 8.dp),
                         color = MaterialTheme.colorScheme.onBackground,
                         trackColor = MaterialTheme.colorScheme.primary,
                     )
                 }
-            }
-            else {
+            } else {
                 LazyColumn() {
                     games.forEach { (gameKey, game) ->
                         item {
@@ -239,7 +266,13 @@ fun TournamentScreen(
             }
         )
     }, floatingActionButtonPosition = FabPosition.End, floatingActionButton = {
+        if(userRole.value == UserRole.ADMINISTRATOR.descripcion){
+            FloatingButton(
+                onClick = {},
+                icon = Icons.Default.Add,
 
+                )
+        }
     }, content = { innerPadding ->
         if (tournament.value.nombre != null) TournamentContent(innerPadding)
     })

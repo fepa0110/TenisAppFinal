@@ -122,7 +122,6 @@ fun TenisAppFApp() {
             LoginScreen(
                 tenisDatabase = tenisDatabase,
                 firebaseAuth = firebaseAuth,
-//                credentialManager = credentialManager,
                 onNavigateToHome = onNavigateToHome,
                 onNavigateToSignUp = onNavigateToSignUp
 
@@ -132,7 +131,6 @@ fun TenisAppFApp() {
             SignUpScreen(
                 tenisDatabase = tenisDatabase,
                 firebaseAuth = firebaseAuth,
-//                credentialManager = credentialManager,
                 onNavigateToHome = onNavigateToHome,
                 onNavigateBack = { navController.popBackStack() }
             )
@@ -150,6 +148,7 @@ fun TenisAppFApp() {
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToGame = onNavigateToGame,
                 tenisDatabase = tenisDatabase,
+                firebaseAuth = firebaseAuth,
                 tournamentId = backStackEntry.arguments?.getString("tournamentId"),
             )
         }
