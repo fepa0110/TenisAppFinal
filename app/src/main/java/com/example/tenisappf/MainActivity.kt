@@ -55,6 +55,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.tenisappf.screens.GameScreen
 import com.example.tenisappf.screens.HomeScreen
 import com.example.tenisappf.screens.LoginScreen
+import com.example.tenisappf.screens.NewPlayerScreen
 import com.example.tenisappf.screens.PlayersScreen
 import com.example.tenisappf.screens.SignUpScreen
 import com.example.tenisappf.screens.TournamentScreen
@@ -101,6 +102,11 @@ fun TenisAppFApp() {
             navController.navigate("signup")
         }
 
+    val onNavigateToNewPlayer: () -> Unit =
+        {
+            navController.navigate("newPlayer")
+        }
+
     val onNavigateToTournament: (String) -> Unit =
         { tournamentId ->
             navController.navigate("tournament/$tournamentId")
@@ -135,12 +141,20 @@ fun TenisAppFApp() {
                 onNavigateBack = { navController.popBackStack() }
             )
         }
+        composable("newPlayer") {
+            NewPlayerScreen(
+                tenisDatabase = tenisDatabase,
+                firebaseAuth = firebaseAuth,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
         composable("home") {
             HomeScreen(
                 tenisDatabase,
                 firebaseAuth = firebaseAuth,
                 signOutUser = signOutUser,
-                onNavigateToTournament = onNavigateToTournament
+                onNavigateToTournament = onNavigateToTournament,
+                onNavigateToNewPlayer = onNavigateToNewPlayer
             )
         }
         composable("tournament/{tournamentId}") { backStackEntry ->

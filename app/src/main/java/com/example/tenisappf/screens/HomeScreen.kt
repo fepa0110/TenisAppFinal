@@ -54,7 +54,8 @@ fun HomeScreen(
     tenisDatabase: FirebaseFirestore,
     firebaseAuth: FirebaseAuth,
     signOutUser: () -> Unit,
-    onNavigateToTournament: (String) -> Unit
+    onNavigateToTournament: (String) -> Unit,
+    onNavigateToNewPlayer: () -> Unit
 ) {
     val currentUser = firebaseAuth.currentUser
     val userRole = remember { mutableStateOf<String>(UserRole.USER.descripcion) }
@@ -130,7 +131,9 @@ fun HomeScreen(
                     FloatingButton(
                         icon = Icons.Filled.Add,
                         onClick = {
-
+                            when (items[selectedItemIndex.intValue].name) {
+                                SCREEN_PLAYERS -> onNavigateToNewPlayer()
+                            }
                         }
                     )
                 }
